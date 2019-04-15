@@ -1,0 +1,23 @@
+#!/usr/bin/env php
+<?php
+
+$arguments = $argv;
+array_shift($arguments);
+
+$selenium_running = false;
+
+$selenium = @fsockopen('localhost', 4444);
+if ($selenium !== false) {
+    fclose($selenium);
+}
+else {
+    // Firefox
+    // shell_exec('java -jar -Dwebdriver.gecko.driver=tests/behat/drivers/geckodriver tests/behat/drivers/selenium-server-standalone-3.141.59.jar > /dev/null 2>&1 &');
+
+    // Chrome
+    shell_exec('java -jar -Dwebdriver.chrome.driver=tests/behat/drivers/chromedriver tests/behat/drivers/selenium-server-standalone-3.141.59.jar > /dev/null 2>&1 &');
+}
+
+system('vendor/bin/behat --colors ' . implode(' ', $arguments));
+#DIRECTORY_SEPARATOR
+# https://medium.com/@glennmcewan/selenium-setup-2c598b95bee1

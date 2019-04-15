@@ -1,0 +1,21 @@
+default:
+  autoload:
+    '': tests/behat/bootstrap
+  suites:
+    default:
+      paths:
+        features: tests/behat/
+      contexts:
+        - BehatContexts\FeatureContext
+  extensions:
+    Behat\MinkExtension:
+      base_url: https://wolfpack.test/
+      browser_name: chrome
+      goutte: ~
+      javascript_session: selenium2
+      selenium2:
+        wd_host: http://127.0.0.1:4444/wd/hub
+        capabilities:
+          browserName: chrome
+          browser: chrome
+          version: '*'

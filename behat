@@ -17,7 +17,7 @@ else {
 
     if ($ds == '/') {
         // Firefox Linux
-        shell_exec("java -jar -Dwebdriver.gecko.driver={$path}geckodriver {$path}{$server}  -log {$log}selenium.log > /dev/null 2>&1 &");
+        shell_exec("java -jar -Dwebdriver.gecko.driver={$path}geckodriver {$path}{$server} -log {$log}selenium.log > /dev/null 2>&1 &");
     } else {
         // Firefox Windows
         pclose(popen("start /B  java -jar  -Dwebdriver.gecko.driver={$path}geckodriver.exe {$path}{$server} -log {$log}selenium.log", 'r'));

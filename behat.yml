@@ -4,18 +4,27 @@ default:
   suites:
     default:
       paths:
-        features: tests/behat/
+        features: "%paths.base%/tests/behat/"
       contexts:
+        - IntegratedExperts\BehatScreenshotExtension\Context\ScreenshotContext
         - BehatContexts\FeatureContext
   extensions:
     Behat\MinkExtension:
       base_url: https://www.wikipedia.org/
-      browser_name: firefox
+      browser_name: chrome
       goutte: ~
-      javascript_session: selenium2
       selenium2:
         wd_host: http://127.0.0.1:4444/wd/hub
+        browser: chrome
         capabilities:
-          browserName: firefox
-          browser: firefox
-          version: '*'
+          marionette: null
+    IntegratedExperts\BehatScreenshotExtension:
+      dir: "%paths.base%/tests/behat/screenshots"
+      fail: true
+      purge: true
+firefox:
+  extensions:
+    Behat\MinkExtension:
+      browser_name: firefox
+      selenium2:
+        browser: firefox

@@ -1,13 +1,8 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: chrysu
- * Date: 3/15/19
- * Time: 3:13 PM
- */
+
+declare(strict_types=1);
 
 namespace BehatContexts\contexts;
-
 
 use Exception;
 use Throwable;
@@ -17,10 +12,10 @@ trait Spinner
     /**
      * {@inheritdoc}
      */
-    public function waitFor(callable $lambda, $timeout = 120)
+    public function waitFor(callable $lambda, int $timeout = 120)
     {
         $lastException = new Exception(
-            'Timeout expired before a single try could be attempted. Is your timeout too short?'
+    'Timeout expired before a single try could be attempted. Is your timeout too short?'
         );
 
         $start = time();
@@ -41,7 +36,7 @@ trait Spinner
     /**
      * {@inheritdoc}
      */
-    public function assertForTimeout(callable $lambda, $timeout = 30)
+    public function assertForTimeout(callable $lambda, int $timeout = 30)
     {
         $start = time();
         while (time() - $start < $timeout) {

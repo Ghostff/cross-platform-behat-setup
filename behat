@@ -6,30 +6,40 @@ array_shift($arguments);
 
 $ds = DIRECTORY_SEPARATOR;
 
+// Check if selenium server is already running.
 $selenium = @fsockopen('localhost', 4444);
 if ($selenium !== false) {
     fclose($selenium);
 }
 else {
     $path   = str_replace('/', $ds, 'tests/behat/drivers/');
-    $log    = str_replace('/', $ds, 'tests/behat/logs');
+    $log    = str_replace('/', $ds, 'tests/behat/logs/selenium.log');
     $server = 'selenium-server-standalone-3.141.59.jar';
 
-    if ($ds == '/') {
-        // Firefox Linux
-        shell_exec("java -jar -Dwebdriver.gecko.driver={$path}geckodriver {$path}{$server} -log {$log}selenium.log > /dev/null 2>&1 &");
-    } else {
-        // Firefox Windows
-        pclose(popen("start /B  java -jar  -Dwebdriver.gecko.driver={$path}geckodriver.exe {$path}{$server} -log {$log}selenium.log", 'r'));
+    $driver = null;
+    // Get profile. Default chrome.
+    foreach ($arguments as $key => $type) {
+        if ($type == '-p' || $type == '--profile') {
+            $driver = $arguments[$key + 1];
+            break;
+        }
     }
 
-    // Firefox
-//    pclose(popen("start /B java -jar -Dwebdriver.gecko.driver={$path}geckodriver.exe {$path}{$server} -log m.log", 'r'));
-//    shell_exec("java -jar -Dwebdriver.gecko.driver={$path}geckodriver.exe {$path}{$server} -log m.log &");
+    if ($driver == 'firefox') {
+        $driver = " -Dwebdriver.gecko.driver={$path}geckodriver";
+    } else {
+        $driver = "-Dwebdriver.chrome.driver={$path}chromedriver";
+    }
 
-    // Chrome
-    // shell_exec("java -jar -Dwebdriver.chrome.driver={$path}chromedriver {$path}{$server} > /dev/null 2>&1 &");
+    if ($ds == '/') {
+        // Firefox|Chrome Linux
+        shell_exec("java -jar $driver {$path}{$server} -log {$log} > /dev/null 2>&1 &");
+    } else {
+        // Firefox|Chrome Windows
+        pclose(popen("start /B  java -jar {$driver}.exe {$path}{$server} -log {$log}", 'r'));
+    }
+    // Make sure selenium is running.
+    sleep(1);
 }
 
 system(str_replace('/', $ds, 'vendor/bin/behat --colors ' ) . implode(' ', $arguments));
-# https://medium.com/@glennmcewan/selenium-setup-2c598b95bee1

@@ -10,10 +10,3 @@ Feature: Search
     When I fill in "search" with "Behavior Driven Development"
     And I press "searchButton"
     Then I should see "agile software development"
-
-#  @javascript
-#  Scenario: Searching for a page that does NOT exist
-#    Given I am on "/wiki/Main_Page"
-#    When I fill in "search" with "Glory Driven Development"
-#    And I press "searchButton"
-#    Then I should see "Search results"

@@ -1,36 +1,33 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: chrysu
- * Date: 3/15/19
- * Time: 3:13 PM
- */
+
+declare(strict_types=1);
 
 namespace BehatContexts;
 
 
 use Behat\Behat\Context\Context;
 use Behat\MinkExtension\Context\MinkContext;
-use BehatContexts\contexts\ScreenshotContext;
 use BehatContexts\contexts\Spinner;
 
 class FeatureContext extends MinkContext implements Context
 {
     use Spinner;
-    use ScreenshotContext;
 
     /**
-     * @BeforeScenario
+     * @Given /^I set browser window size to "([^"]*)" x "([^"]*)"$/
+     * @param int $width
+     * @param int $height
      */
-    public function resizeWindow()
+    public function iSetBrowserWindowSizeToX(int $width, int $height)
     {
-        $this->getSession()->resizeWindow(1440, 900, 'current');
+        $this->getSession()->resizeWindow($width, $height, 'current');
     }
 
     /**
      * @When /^I wait for name (\d+) seconds$/
+     * @param int $seconds
      */
-    public function iWaitForSeconds($seconds)
+    public function iWaitForSeconds(int $seconds)
     {
         $this->getSession()->wait($seconds * 1000);
     }

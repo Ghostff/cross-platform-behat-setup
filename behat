@@ -12,31 +12,17 @@ if ($selenium !== false) {
     fclose($selenium);
 }
 else {
-    $path   = str_replace('/', $ds, 'tests/behat/drivers/');
-    $log    = str_replace('/', $ds, 'tests/behat/logs/selenium.log');
-    $server = 'selenium-server-standalone-3.141.59.jar';
-
-    $driver = null;
-    // Get profile. Default chrome.
-    foreach ($arguments as $key => $type) {
-        if ($type == '-p' || $type == '--profile') {
-            $driver = $arguments[$key + 1];
-            break;
-        }
-    }
-
-    if ($driver == 'firefox') {
-        $driver = " -Dwebdriver.gecko.driver={$path}geckodriver";
-    } else {
-        $driver = "-Dwebdriver.chrome.driver={$path}chromedriver";
-    }
+    $path    = str_replace('/', $ds, 'tests/behat/drivers/');
+    $log     = str_replace('/', $ds, 'tests/behat/logs/selenium.log');
+    $server  = 'selenium-server-standalone-3.141.59.jar';
+    $drivers = " -Dwebdriver.gecko.driver={$path}geckodriver -Dwebdriver.chrome.driver={$path}chromedriver";
 
     if ($ds == '/') {
         // Firefox|Chrome Linux
-        shell_exec("java -jar $driver {$path}{$server} -log {$log} > /dev/null 2>&1 &");
+        shell_exec("java -jar $drivers {$path}{$server} -log {$log} > /dev/null 2>&1 &");
     } else {
         // Firefox|Chrome Windows
-        pclose(popen("start /B  java -jar {$driver}.exe {$path}{$server} -log {$log}", 'r'));
+        pclose(popen("start /B  java -jar {$drivers}.exe {$path}{$server} -log {$log}", 'r'));
     }
     // Make sure selenium is running.
     sleep(1);

@@ -4,20 +4,32 @@
 $arguments = $argv;
 array_shift($arguments);
 
-$selenium_running = false;
+$ds = DIRECTORY_SEPARATOR;
 
 $selenium = @fsockopen('localhost', 4444);
 if ($selenium !== false) {
     fclose($selenium);
 }
 else {
+    $path   = str_replace('/', $ds, 'tests/behat/drivers/');
+    $log    = str_replace('/', $ds, 'tests/behat/logs');
+    $server = 'selenium-server-standalone-3.141.59.jar';
+
+    if ($ds == '/') {
+        // Firefox Linux
+        shell_exec("java -jar -Dwebdriver.gecko.driver={$path}geckodriver {$path}{$server}  -log {$log}selenium.log > /dev/null 2>&1 &");
+    } else {
+        // Firefox Windows
+        pclose(popen("start /B  java -jar  -Dwebdriver.gecko.driver={$path}geckodriver.exe {$path}{$server} -log {$log}selenium.log", 'r'));
+    }
+
     // Firefox
-    // shell_exec('java -jar -Dwebdriver.gecko.driver=tests/behat/drivers/geckodriver tests/behat/drivers/selenium-server-standalone-3.141.59.jar > /dev/null 2>&1 &');
+//    pclose(popen("start /B java -jar -Dwebdriver.gecko.driver={$path}geckodriver.exe {$path}{$server} -log m.log", 'r'));
+//    shell_exec("java -jar -Dwebdriver.gecko.driver={$path}geckodriver.exe {$path}{$server} -log m.log &");
 
     // Chrome
-    shell_exec('java -jar -Dwebdriver.chrome.driver=tests/behat/drivers/chromedriver tests/behat/drivers/selenium-server-standalone-3.141.59.jar > /dev/null 2>&1 &');
+    // shell_exec("java -jar -Dwebdriver.chrome.driver={$path}chromedriver {$path}{$server} > /dev/null 2>&1 &");
 }
 
-system('vendor/bin/behat --colors ' . implode(' ', $arguments));
-#DIRECTORY_SEPARATOR
+system(str_replace('/', $ds, 'vendor/bin/behat --colors ' ) . implode(' ', $arguments));
 # https://medium.com/@glennmcewan/selenium-setup-2c598b95bee1

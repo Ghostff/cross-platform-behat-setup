@@ -1,30 +1,39 @@
 #!/usr/bin/env php
 <?php
+declare(strict_types=1);
 
-$arguments = $argv;
-array_shift($arguments);
+$args = $argv;
+array_shift($args);
 
-// Check if selenium server is already running.
-$selenium = @fsockopen('localhost', 4444);
-if ($selenium !== false) {
-    fclose($selenium);
-}
-else {
-    $path    = str_replace('/', DIRECTORY_SEPARATOR, 'tests/behat/drivers/');
-    $log     = str_replace('/', DIRECTORY_SEPARATOR, 'tests/behat/logs/selenium.log');
-    $server  = 'selenium-server-standalone-3.141.59.jar';
-
-    if (DIRECTORY_SEPARATOR == '/') {
-        // firefox and chrome driver path for Linux
-        $drivers = " -Dwebdriver.gecko.driver={$path}geckodriver -Dwebdriver.chrome.driver={$path}chromedriver";
-        shell_exec("java -jar $drivers {$path}{$server} -log {$log} > /dev/null 2>&1 &");
-    } else {
-        // firefox and chrome driver path for Windows.
-        $drivers = " -Dwebdriver.gecko.driver={$path}geckodriver.exe -Dwebdriver.chrome.driver={$path}chromedriver.exe";
-        pclose(popen("start /B  java -jar {$drivers} {$path}{$server} -log {$log}", 'r'));
+function setUp(array $arguments)
+{
+    // Check if selenium server is already running.
+    $selenium = @fsockopen('localhost', 4444);
+    if ($selenium !== false)
+    {
+        fclose($selenium);
     }
-    // Make sure selenium is running.
-    sleep(1);
+    else
+    {
+        $path     = str_replace('/', DIRECTORY_SEPARATOR, 'tests/behat/drivers/');
+        $log      = str_replace('/', DIRECTORY_SEPARATOR, 'tests/behat/logs/selenium.log');
+        $pipe_log = str_replace('/', DIRECTORY_SEPARATOR, 'tests/behat/logs/output.log');
+        $server   = 'selenium-server-standalone-3.141.59.jar';
+
+        if (DIRECTORY_SEPARATOR == '/') {
+            // firefox and chrome driver path for Linux
+            $drivers = " -Dwebdriver.gecko.driver={$path}geckodriver -Dwebdriver.chrome.driver={$path}chromedriver";
+            shell_exec("java -jar $drivers {$path}{$server} -log {$log} > {$pipe_log} 2>&1 &");
+        } else {
+            // firefox and chrome driver path for Windows.
+            $drivers = " -Dwebdriver.gecko.driver={$path}geckodriver.exe -Dwebdriver.chrome.driver={$path}chromedriver.exe";
+            pclose(popen("start /B  java -jar {$drivers} {$path}{$server} -log {$log}", 'r'));
+        }
+        // Make sure selenium is running.
+        sleep(1);
+    }
+
+    system(str_replace('/', DIRECTORY_SEPARATOR, 'vendor/bin/behat --colors ' ) . implode(' ', $arguments));
 }
 
-system(str_replace('/', DIRECTORY_SEPARATOR, 'vendor/bin/behat --colors ' ) . implode(' ', $arguments));
+(! empty($args) && ($args[0] == 'kill')) ? shell_exec('kill -9 $(lsof -ti tcp:4444)') : setUp($args);

@@ -16,8 +16,6 @@ default:
       selenium2:
         wd_host: http://127.0.0.1:4444/wd/hub
         browser: chrome
-        capabilities:
-          marionette: null
     IntegratedExperts\BehatScreenshotExtension:
       dir: "%paths.base%/tests/behat/screenshots"
       fail: true

@@ -2,6 +2,6 @@
 A Behat setup that run both on Unix and windows platform.
 ```bash
 php behat
-# For firefox (still need some work done)
+# For firefox (currently crashing)
 php behat -p firefox
 ```

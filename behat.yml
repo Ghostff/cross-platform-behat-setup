@@ -38,6 +38,3 @@ firefox:
         browser: firefox
         capabilities:
           marionette: true
-          extra_capabilities:
-            lossg:
-              level: trace

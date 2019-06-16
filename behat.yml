@@ -6,23 +6,38 @@ default:
       paths:
         features: "%paths.base%/tests/behat/"
       contexts:
-        - IntegratedExperts\BehatScreenshotExtension\Context\ScreenshotContext
         - BehatContexts\FeatureContext
-  extensions:
-    Behat\MinkExtension:
-      base_url: https://www.wikipedia.org/
-      browser_name: chrome
-      goutte: ~
-      selenium2:
-        wd_host: http://127.0.0.1:4444/wd/hub
-        browser: chrome
-    IntegratedExperts\BehatScreenshotExtension:
-      dir: "%paths.base%/tests/behat/screenshots"
-      fail: true
-      purge: true
+    extensions:
+      Behat\MinkExtension:
+        base_url: https://www.wikipedia.org/
+        browser_name: chrome
+        goutte: ~
+        selenium2:
+          wd_host: http://127.0.0.1:4444/wd/hub
+          browser: chrome
+          capabilities:
+            chrome:
+              switches:
+#                - "--headless"
+#                - "--hide-scrollbars"
+#                - "--disable-software-rasterizer"
+#                - "--disable-dev-shm-usage"
+#                - "--no-sandbox"
+#                - "incognito"
+#                - "--disable-gpu"
+                - "--window-size=1920,1080"
+#                - "--start-maximized"
+
 firefox:
   extensions:
     Behat\MinkExtension:
+      base_url: https://www.wikipedia.org/
       browser_name: firefox
       selenium2:
+        wd_host: http://127.0.0.1:4444/wd/hub
         browser: firefox
+        capabilities:
+          marionette: true
+          extra_capabilities:
+            lossg:
+              level: trace

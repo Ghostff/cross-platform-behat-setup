@@ -1,3 +1,6 @@
 /.idea
 /vendor
-/tests/behat/logs
+/tests/behat/logs/*
+!/tests/behat/logs/.gitkeep
+/tests/behat/screenshots/*
+!/tests/behat/screenshots/.gitkeep

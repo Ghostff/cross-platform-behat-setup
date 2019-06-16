@@ -1,11 +1,13 @@
 #!/usr/bin/env php
 <?php
 declare(strict_types=1);
+error_reporting(E_ALL);
 
 $args = $argv;
+$unix = DIRECTORY_SEPARATOR == '/';
 array_shift($args);
 
-function setUp(array $arguments)
+function setUp(array $arguments, bool $unix)
 {
     // Check if selenium server is already running.
     $selenium = @fsockopen('localhost', 4444);
@@ -15,19 +17,19 @@ function setUp(array $arguments)
     }
     else
     {
-        $path     = str_replace('/', DIRECTORY_SEPARATOR, 'tests/behat/drivers/');
-        $log      = str_replace('/', DIRECTORY_SEPARATOR, 'tests/behat/logs/selenium.log');
-        $pipe_log = str_replace('/', DIRECTORY_SEPARATOR, 'tests/behat/logs/output.log');
+        $path     = __DIR__  . str_replace('/', DIRECTORY_SEPARATOR, '/tests/behat/drivers/');
+        $log      = __DIR__  . str_replace('/', DIRECTORY_SEPARATOR, '/tests/behat/logs/selenium.log');
+        $pipe_log = __DIR__  . str_replace('/', DIRECTORY_SEPARATOR, '/tests/behat/logs/output.log');
         $server   = 'selenium-server-standalone-3.141.59.jar';
 
-        if (DIRECTORY_SEPARATOR == '/') {
+        if ($unix) {
             // firefox and chrome driver path for Linux
-            $drivers = " -Dwebdriver.gecko.driver={$path}geckodriver -Dwebdriver.chrome.driver={$path}chromedriver";
+            $drivers = "-Dwebdriver.gecko.driver={$path}geckodriver -Dwebdriver.chrome.driver={$path}chromedriver";
             shell_exec("java -jar $drivers {$path}{$server} -log {$log} > {$pipe_log} 2>&1 &");
         } else {
             // firefox and chrome driver path for Windows.
-            $drivers = " -Dwebdriver.gecko.driver={$path}geckodriver.exe -Dwebdriver.chrome.driver={$path}chromedriver.exe";
-            pclose(popen("start /B  java -jar {$drivers} {$path}{$server} -log {$log}", 'r'));
+            $drivers = "-Dwebdriver.gecko.driver={$path}geckodriver.exe -Dwebdriver.chrome.driver={$path}chromedriver.exe";
+            pclose(popen("start /B java -jar {$drivers} {$path}{$server} -log {$log} >{$pipe_log} >>{$pipe_log} 2>&1", 'r'));
         }
         // Make sure selenium is running.
         sleep(1);
@@ -36,4 +38,7 @@ function setUp(array $arguments)
     system(str_replace('/', DIRECTORY_SEPARATOR, 'vendor/bin/behat --colors ' ) . implode(' ', $arguments));
 }
 
-(! empty($args) && ($args[0] == 'kill')) ? shell_exec('kill -9 $(lsof -ti tcp:4444)') : setUp($args);
+(! empty($args) && ($args[0] == 'kill')) ? shell_exec($unix
+    ? 'kill -9 $(lsof -ti tcp:4444)'
+    : 'for /f "tokens=5" %a in (\'netstat -aon ^| find ":4444" ^| find "LISTENING"\') do taskkill /f /pid %a'
+) :  setUp($args, $unix);
